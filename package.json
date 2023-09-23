@@ -1,0 +1,19 @@
+{
+  "name": "ericmina83.github.io",
+  "version": "1.0.0",
+  "main": "index.js",
+  "repository": "https://github.com/ericmina83/ericmina83.github.io.git",
+  "author": "Jyun-An, Zou <ericmina83@gmail.com>",
+  "license": "MIT",
+  "scripts": {
+    "start": "vite",
+    "build": "vite build"
+  },
+  "dependencies": {
+    "@types/three": "^0.156.0",
+    "react": "^18.2.0",
+    "three": "^0.156.1",
+    "typescript": "^5.2.2",
+    "vite": "^4.4.9"
+  }
+}

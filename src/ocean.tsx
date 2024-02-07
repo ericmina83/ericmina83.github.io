@@ -1,46 +1,30 @@
-import React, { useRef, useMemo, useEffect } from "react";
-import { useLoader, useFrame } from "@react-three/fiber";
-import * as THREE from "three";
+import React from "react";
+import { useThree } from "@react-three/fiber";
+import waterVertex from "./water.vert";
+import waterFragment from "./water.frag";
 
-import { Water } from "three/examples/jsm/objects/Water.js";
+import { useDepthBuffer } from "@react-three/drei";
 
-function Ocean() {
-  const ref = useRef<Water>(null!);
-  const waterNormals = useLoader(
-    THREE.TextureLoader,
-    "https://raw.githubusercontent.com/mrdoob/three.js/master/examples/textures/waternormals.jpg"
-  );
-
-  useEffect(() => {
-    waterNormals.wrapS = waterNormals.wrapT = THREE.RepeatWrapping;
-  }, [waterNormals]);
-
-  const geom = useMemo(() => new THREE.PlaneGeometry(30000, 30000), []);
-  const config = useMemo(
-    () => ({
-      textureWidth: 512,
-      textureHeight: 512,
-      waterNormals,
-      sunDirection: new THREE.Vector3(),
-      sunColor: 0xeb8934,
-      waterColor: 0x0064b5,
-      distortionScale: 40,
-      fog: false,
-    }),
-    [waterNormals]
-  );
-  useFrame((state, delta) => {
-    if (ref.current) {
-      ref.current.material.uniforms.time.value += delta;
-    }
+function Ocean({ size }: { size: number }) {
+  const db = useDepthBuffer({
+    size: 2048,
   });
+
+  const { camera } = useThree();
+
   return (
-    <water
-      ref={ref}
-      args={[geom, config]}
-      rotation-x={-Math.PI / 2}
-      position={[0, 0, 0]}
-    />
+    <mesh rotation-x={-Math.PI / 2} scale={[1, 1, 1]}>
+      <planeGeometry args={[size, size, 1, 1]} />
+      <shaderMaterial
+        uniforms={{
+          cameraNear: { value: camera.near },
+          cameraFar: { value: camera.far },
+          tDepth: { value: db },
+        }}
+        vertexShader={waterVertex}
+        fragmentShader={waterFragment}
+      />
+    </mesh>
   );
 }
 

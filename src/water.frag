@@ -3,6 +3,7 @@ precision highp float;
 varying vec4 vPos;
 varying vec4 pPos;
 uniform sampler2D tDepth;
+uniform sampler2D map;
 uniform float cameraNear;
 uniform float cameraFar;
 
@@ -23,6 +24,10 @@ void main() {
 
     float depth = readDepth(tDepth, uv);
 
-    gl_FragColor.rgb = vec3(1.0 - ((vPos.z - depth) / 40.0));
+    float ratio = 1.0 - ((vPos.z - depth) / 40.0);
+    
+    vec4 color = texture2D(map, uv) * ratio;
+
+    gl_FragColor.rgb = color.rgb;
     gl_FragColor.a = 1.0;
 }

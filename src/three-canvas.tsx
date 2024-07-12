@@ -5,7 +5,12 @@ import { Scene } from "./scene";
 
 export function ThreeCanvas() {
   return (
-    <Canvas>
+    <Canvas
+      shadows
+      // gl={{ antialias: false }}
+      camera={{ position: [0, 0, 20], fov: 32.5, near: 1, far: 10000 }}
+      // onCreated={(state) => (state.gl.toneMappingExposure = 1.5)}
+    >
       <CameraControls />
       <Scene />
     </Canvas>

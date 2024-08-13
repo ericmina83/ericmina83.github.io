@@ -1,21 +1,25 @@
 // https://github.com/madblade/waves-gerstner
 
-attribute vec3 position;
+// attribute vec3 position;
 
-uniform mat4 projectionMatrix;
-uniform mat4 modelMatrix;
-uniform mat4 normalMatrix;
-uniform mat4 viewMatrix;
-uniform sampler2D waveData;
+// uniform mat4 projectionMatrix;
+// uniform mat4 modelMatrix;
+// uniform mat4 normalMatrix;
+// uniform mat4 viewMatrix;
+uniform mat4 textureMatrix;
 uniform float time;
+uniform sampler2D waveData;
 
-varying vec4 vWorldPos;
-varying vec4 vViewPos;
-varying vec4 vScreenPos;
-varying vec3 vNormal;
+varying vec4 worldPosition;
+varying vec3 vvnormal;
 
 const float pi = 3.1415926;
-const int waveCount = 16;
+const int waveCount = 32;
+
+#include <common>
+#include <fog_pars_vertex>
+#include <shadowmap_pars_vertex>
+#include <logdepthbuf_pars_vertex>
 
 float random(vec2 p) {
     vec3 p3 = fract(vec3(p.xyx) * .1031);
@@ -26,7 +30,7 @@ float random(vec2 p) {
 vec3 addWaveOffset(vec2 coord, float angle, float amplitude, float waveLength, float steepness, float speed) {
     vec2 d = vec2(cos(angle), sin(angle));
     float omega = 2.0 * pi / waveLength;
-    float phase = 2.0 * pi * speed;
+    float phase = omega * speed;
     float dotWpD = omega * dot(coord, d) + phase * time;
 
     float x = steepness / omega * d.x * cos(dotWpD);
@@ -39,12 +43,12 @@ vec3 addWaveOffset(vec2 coord, float angle, float amplitude, float waveLength, f
 vec3 addWaveNormal(vec2 coord, float angle, float amplitude, float waveLength, float steepness, float speed) {
     vec2 d = vec2(cos(angle), sin(angle));
     float omega = 2.0 * pi / waveLength;
-    float phase = 2.0 * pi * speed;
+    float phase = omega * speed;
     float dotWpD = omega * dot(coord, d) + phase * time;
 
     float x = amplitude * omega * cos(dotWpD) * d.x;
-    float y = steepness * omega * sin(dotWpD);
-    float z = amplitude * omega * cos(dotWpD) * d.y;
+    float y = amplitude * omega * cos(dotWpD) * d.y;
+    float z = steepness * omega * sin(dotWpD);
 
     return vec3(x, y, z);
 }
@@ -54,21 +58,21 @@ float lerp(float min, float max, float t) {
 }
 
 void main() {
-    vWorldPos = modelMatrix * vec4(position, 1);
-    vec2 coord = vWorldPos.xz;
-    vNormal = vec3(0, 1, 0);
+    worldPosition = modelMatrix * vec4(position, 1);
+    vec2 coord = worldPosition.xz;
+    vvnormal = vec3(0, 0, 1);
 
     float fWaveCount = float(waveCount);
 
     for(int i = 0; i < waveCount; i++) {
         float ang = random(vec2(i, 1.0)) * 2.0 * pi;
-        float len = lerp(5.0, 10.0, random(vec2(i, 2.0)));
-        float amp = lerp(0.6, 3.0, random(vec2(i, 3.0))) / fWaveCount;
+        float len = lerp(100.0, 150.0, random(vec2(i, 2.0)));
+        float amp = lerp(20.0, 30.0, random(vec2(i, 3.0))) / fWaveCount;
         float ste = lerp(0.8, 1.0, random(vec2(i, 4.0))) / fWaveCount;
-        float spe = lerp(0.2, 1.0, random(vec2(i, 5.0)));
+        float spe = lerp(20.0, 25.0, random(vec2(i, 5.0)));
 
-        vWorldPos += vec4(addWaveOffset(coord, ang, amp, len, ste, spe), 0.0);
-        vNormal -= addWaveNormal(coord, ang, amp, len, ste, spe);
+        worldPosition += vec4(addWaveOffset(coord, ang, amp, len, ste, spe), 0.0);
+        vvnormal -= addWaveNormal(coord, ang, amp, len, ste, spe);
     }
     // float dotWpD = dot(vWorldPos.xz, direction);
     // vWorldPos.x += steepness * direction.x * cos(dotWpD);
@@ -82,7 +86,11 @@ void main() {
     // vNormal = normalize(vNormal);
     // vNormal = (normalMatrix * vec4(vNormal, 0.0)).xyz;
 
-    vViewPos = viewMatrix * vWorldPos;
-    vScreenPos = projectionMatrix * vViewPos;
-    gl_Position = vScreenPos;
+    gl_Position = projectionMatrix * viewMatrix * worldPosition;
+
+    #include <beginnormal_vertex>
+    #include <defaultnormal_vertex>
+    #include <logdepthbuf_vertex>
+    #include <fog_vertex>
+    #include <shadowmap_vertex>
 }

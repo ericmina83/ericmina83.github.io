@@ -3,7 +3,7 @@ import waterVertex from "@/Assets/Shaders/water.vert";
 import waterFragment from "@/Assets/Shaders/water.frag";
 
 import { useDepthBuffer, useFBO } from "@react-three/drei";
-import { DataTexture, Vector2, RepeatWrapping, RGBAFormat, NearestFilter, RawShaderMaterial } from "three";
+import { DataTexture, Vector2, RepeatWrapping, RGBAFormat, NearestFilter, UniformsLib, ShaderMaterial } from "three";
 import { useMemo, useRef } from "react";
 
 let time = 0;
@@ -21,7 +21,7 @@ function getWave(j: number, jMax: number) {
 }
 
 export const Ocean: React.FC<{ size: number }> = ({ size }) => {
-  const materialRef = useRef<RawShaderMaterial>(null!)
+  const materialRef = useRef<ShaderMaterial>(null!)
 
   const dataTexture = useMemo(() => {
     const width = 8;
@@ -64,7 +64,6 @@ export const Ocean: React.FC<{ size: number }> = ({ size }) => {
     gl.setRenderTarget(rt);
     gl.render(scene, camera);
     gl.setRenderTarget(null);
-    console.log(delta);
     time += delta;
 
     const material = materialRef.current;
@@ -93,7 +92,7 @@ export const Ocean: React.FC<{ size: number }> = ({ size }) => {
         />
       </bufferGeometry> */}
       {/* <meshNormalMaterial /> */}
-      <rawShaderMaterial
+      <shaderMaterial
         ref={materialRef}
         uniforms={{
           direction: { value: (new Vector2(1, 1)).normalize() },
@@ -103,6 +102,8 @@ export const Ocean: React.FC<{ size: number }> = ({ size }) => {
           cameraNear: { value: camera.near },
           cameraFar: { value: camera.far },
           tDepth: { value: db },
+          ...UniformsLib.fog,
+          ...UniformsLib.lights,
         }}
         vertexShader={waterVertex}
         fragmentShader={waterFragment}

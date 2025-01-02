@@ -64,7 +64,6 @@ export const Ocean: React.FC<{ size: number }> = ({ size }) => {
     gl.setRenderTarget(rt);
     gl.render(scene, camera);
     gl.setRenderTarget(null);
-    console.log(delta);
     time += delta;
 
     const material = materialRef.current;

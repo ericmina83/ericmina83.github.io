@@ -1,5 +1,4 @@
 import { useGLTF } from "@react-three/drei";
-import { useFrame } from "@react-three/fiber";
 import React, { forwardRef, useEffect, useMemo } from "react";
 import { Euler, Group, Mesh, MeshStandardMaterial, Object3DEventMap, Vector2, Vector3 } from "three";
 

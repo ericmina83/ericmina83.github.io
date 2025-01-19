@@ -19,7 +19,6 @@ uniform sampler2D tDepth;
 uniform float cameraNear;
 uniform float cameraFar;
 
-varying vec3 vvnormal;
 varying vec4 mirrorCoord;
 varying vec4 worldPosition;
 
@@ -88,7 +87,7 @@ void main() {
     #include <logdepthbuf_fragment>
 
     vec4 noise = getNoise(worldPosition.xz * size);
-    vec3 surfaceNormal = normalize(vvnormal + noise.xzy * vec3(1.5, 1.0, 1.5)); // this for mix
+    vec3 surfaceNormal = normalize(noise.xzy * vec3(1.5, 1.0, 1.5)); // this for mix
 
     vec3 diffuseLight = vec3(0.0);
     vec3 specularLight = vec3(0.0);

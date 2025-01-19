@@ -1,0 +1,22 @@
+@font-face {
+    font-family: "TheRumIsGone";
+    src: url("font/TheRumIsGone-Wy1nG.ttf");
+}
+
+@font-face {
+    font-family: "BlackRose";
+    src: url("font/BlackRose-2Onld.ttf");
+}
+
+
+/* sohne, "Helvetica Neue", Helvetica, Arial, sans-serif */
+@font-face {
+    font-family: "Treasuremap";
+    src: url("font/Treasuremap-Ea1vj.ttf");
+}
+
+body {
+    margin: 0;
+    overflow-x: hidden;
+    font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+}

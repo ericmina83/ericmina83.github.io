@@ -1,0 +1,28 @@
+.Container {
+    display: flex;
+    width: 800px;
+    margin: 0 auto;
+    flex-direction: column;
+}
+
+.Title {
+    text-align: center;
+    font-size: 1.5em;
+}
+
+.Experience {
+    width: 100%;
+}
+
+.Job {
+    padding-left: 15px;
+}
+
+.Detail {
+    padding-left: 30px;
+    font-size: 1.2em;
+}
+
+.Duration {
+    text-align: right;
+}

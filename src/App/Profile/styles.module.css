@@ -1,0 +1,38 @@
+/* Make div center */
+/* div outside -> display: flex */
+/* div inside -> margin: auto */
+
+.Container {
+    display: flex;
+    height: 100vh;
+    margin: 0 auto;
+    text-align: center;
+}
+
+.Profile {
+    margin: auto;
+    width: fit-content;
+}
+
+.ProfileLeft,
+.ProfileRight {
+    display: table-cell;
+    vertical-align: middle;
+    margin: auto 0;
+    padding: 0 20px;
+}
+
+.Thumbnail {
+    height: 125px;
+    width: 125px;
+    overflow: hidden;
+    border-radius: 20%;
+    background: #F2F2F2;
+    box-shadow: 0px 0px 0px 0.45em rgba(255, 255, 255, 0.35);
+    transition: all 500ms;
+}
+
+.Thumbnail img {
+    width: 100%;
+    transition: all 500ms;
+}

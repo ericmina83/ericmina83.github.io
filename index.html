@@ -1,23 +1,32 @@
 <!doctype html>
 <html lang="en">
-  <head>
+
+<head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>Eric's page</title>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Dancing+Script">
+    <link rel="stylesheet" href="src/default.css">
     <style>
-      body {
-        margin: 0;
-      }
-      #root {
-        width: 100vw;
-        height: 100vh;
-        margin: 0;
-      }
+        #canvas {
+            width: 100vw;
+            height: 100vh;
+            margin: 0;
+            top: 0;
+            left: 0;
+            position: fixed;
+        }
     </style>
-  </head>
-  <body>
-    <div id="root">
-    </div>
-    <script type="module" src="src/main.ts"></script>
-  </body>
+</head>
+
+<body>
+    <div id="root"> </div>
+
+    <!-- three js canvas with fixed position -->
+    <div id="canvas"> </div>
+
+    <script type="module" src="src/canvas.ts"></script>
+    <script type="module" src="src/main.tsx"></script>
+</body>
+
 </html>

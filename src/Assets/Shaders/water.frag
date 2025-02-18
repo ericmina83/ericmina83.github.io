@@ -21,6 +21,8 @@ uniform float cameraFar;
 
 varying vec4 mirrorCoord;
 varying vec4 worldPosition;
+// varying vec4 vScreenPos;
+// varying vec4 vViewPos;
 
 // vec4 getNoise(vec2 uv) {
 //     vec2 uv0 = (uv / 103.0) + vec2(time / 17.0, time / 29.0);
@@ -73,14 +75,14 @@ void sunLight(
     diffuseColor += max(dot(sunDirection, surfaceNormal), 0.0) * sunColor * diffuse;
 }
 
-// https://gist.github.com/greggman/41d93c00649cba78abdbfc1231c9158c
-float perspectiveDepthToViewZTEMP(const in float invClipZ, const in float near, const in float far) {
-    return (near * far) / ((far - near) * invClipZ - far);
-}
+// // https://gist.github.com/greggman/41d93c00649cba78abdbfc1231c9158c
+// float perspectiveDepthToViewZTEMP(const in float invClipZ, const in float near, const in float far) {
+//     return (near * far) / ((far - near) * invClipZ - far);
+// }
 
 float readDepth(sampler2D depthSampler, vec2 coord) {
     float fragCoordZ = texture2D(depthSampler, coord).x;
-    return perspectiveDepthToViewZTEMP(fragCoordZ, cameraNear, cameraFar);
+    return perspectiveDepthToViewZ(fragCoordZ, cameraNear, cameraFar);
 }
 
 void main() {

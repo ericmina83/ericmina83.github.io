@@ -1,11 +1,12 @@
 import boatModel from './Assets/Models/boat.glb?url';
 
-import { ACESFilmicToneMapping, Clock, Fog, MathUtils, PerspectiveCamera, PMREMGenerator, Scene, Vector3, WebGLRenderer, WebGLRenderTarget } from "three";
+import { ACESFilmicToneMapping, Clock, DepthFormat, DepthTexture, Fog, MathUtils, NearestFilter, PerspectiveCamera, PMREMGenerator, Scene, UnsignedShortType, Vector3, WebGLRenderer, WebGLRenderTarget } from "three";
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls";
 import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader";
 import { Sky } from "three/examples/jsm/objects/Sky";
 // import { Water } from "three/examples/jsm/objects/Water";
 import { GerstnerWater } from "./GerstnerWater";
+import Floater from './Floater';
 
 const root = document.getElementById('canvas');
 
@@ -20,6 +21,7 @@ renderer.toneMapping = ACESFilmicToneMapping;
 renderer.toneMappingExposure = 0.25;
 renderer.setPixelRatio(window.devicePixelRatio);
 renderer.setSize(window.innerWidth, window.innerHeight);
+renderer.autoClear = false;
 const canvas = renderer.domElement;
 root.appendChild(canvas);
 
@@ -53,10 +55,14 @@ scene.fog = new Fog(0xC0BBB9, 0, 300);
 
 const fbxLoader = new GLTFLoader();
 
+let floater: Floater | null = null;
+
 fbxLoader.loadAsync(boatModel).then((model) => {
   const { scene: boat } = model;
   boat.scale.setScalar(40);
   scene.add(boat);
+
+  floater = new Floater(scene, boat, water, true)
 });
 
 const sun = new Vector3();
@@ -103,6 +109,8 @@ function updateSun() {
   scene.add(sky);
 
   scene.environment = renderTarget.texture;
+  // waterScene.environment = renderTarget.texture;
+  // waterScene.add(sky)
 }
 
 updateSun();
@@ -114,9 +122,14 @@ controls.minDistance = 40.0;
 controls.maxDistance = 200.0;
 controls.update();
 
+
 const animate = () => {
+
   const delta = clock.getDelta();
   water.updateDeltaTime(delta);
+  floater?.update(delta);
+
+  renderer.setRenderTarget(null);
   renderer.render(scene, camera);
 };
 

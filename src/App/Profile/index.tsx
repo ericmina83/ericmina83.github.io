@@ -1,6 +1,8 @@
 import React from "react";
 import styles from "./styles.module.css";
 
+import googleSvg from "../../Assets/images/google.svg?url";
+
 export const Profile: React.FC = () => {
   return (
     <div className={styles.Container}>
@@ -8,7 +10,7 @@ export const Profile: React.FC = () => {
 
         <div className={styles.ProfileLeft}>
           <div className={styles.Thumbnail}>
-            <img src="src/Assets/images/google.svg" />
+            <img src={googleSvg} />
           </div>
         </div>
 

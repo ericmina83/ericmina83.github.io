@@ -10,6 +10,8 @@ uniform vec3 wave3;
 
 varying vec4 worldPosition;
 varying vec4 mirrorCoord;
+varying vec4 vScreenPos;
+varying vec4 vViewPos;
 
 #include <common>
 #include <fog_pars_vertex>
@@ -31,7 +33,7 @@ vec3 getWaveOffset(vec2 coord, float angle, float amplitude, float waveLength) {
     float omega = 2.0 * pi / waveLength;
     float amp = amplitude / omega;
     float c = sqrt(9.8 / omega);
-    float dotWpD = omega * dot(coord, d) + c * time;
+    float dotWpD = omega * (dot(coord, d) - c * time);
 
     float x = amp * d.x * cos(dotWpD);
     float y = amp * sin(dotWpD);
@@ -62,8 +64,8 @@ float lerp(float min, float max, float t) {
 
 void main() {
     worldPosition = modelMatrix * vec4(position, 1.0);
-    mirrorCoord = worldPosition.xyzw;
-    mirrorCoord = textureMatrix * mirrorCoord;
+    // mirrorCoord = worldPosition.xyzw;
+    // mirrorCoord = textureMatrix * mirrorCoord;
 
     vec3 gp = worldPosition.xyz;
 
@@ -83,8 +85,12 @@ void main() {
     gp += getWaveOffset(coord, wave3.x, wave3.y, wave3.z);
 
     worldPosition = vec4(gp, 1.0);
-    vec4 mvPosition = viewMatrix * worldPosition;
-    gl_Position = projectionMatrix * mvPosition;
+    mirrorCoord = worldPosition.xyzw;
+    mirrorCoord.y = 0.0;
+    mirrorCoord = textureMatrix * mirrorCoord;
+    vViewPos = viewMatrix * worldPosition;
+    vScreenPos = projectionMatrix * vViewPos;
+    gl_Position = vScreenPos;
 
     #include <beginnormal_vertex>
     #include <defaultnormal_vertex>

@@ -1,6 +1,6 @@
 import { BufferAttribute, BufferGeometry, Vector2 } from "three";
 
-import { PerlinNoise } from "@/PerlinNoise";
+import { PerlinNoise } from "@/ThreePlugin/PerlinNoise";
 
 export class PerlinNoiseGeometry extends BufferGeometry {
   constructor(size: number, resolution: number) {

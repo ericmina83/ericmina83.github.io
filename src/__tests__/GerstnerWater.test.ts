@@ -1,5 +1,5 @@
 import { MathUtils, Vector2, Vector3 } from "three";
-import { getWaveInfo as getWaveInfoTarget } from "../GerstnerWater.utility";
+import { getWaveInfo as getWaveInfoTarget } from "../ThreePlugin/GerstnerWater.utility";
 import { describe, expect, test } from '@jest/globals';
 
 // function from https://sbedit.net/utils/gerstnerWater.js

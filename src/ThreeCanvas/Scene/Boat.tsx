@@ -3,7 +3,7 @@ import React, { forwardRef, useEffect, useMemo } from "react";
 import { Euler, Group, Mesh, MeshStandardMaterial, Object3DEventMap, Vector2, Vector3 } from "three";
 
 import boatUrl from "@/Assets/Models/boat.glb?url";
-import { PerlinNoise } from "@/PerlinNoise";
+import { PerlinNoise } from "@/ThreePlugin/PerlinNoise";
 
 // function easeInOutSine(x: number): number {
 //   return -(Math.cos(Math.PI * x) - 1) / 2;

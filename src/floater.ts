@@ -81,7 +81,6 @@ export default class Floater {
     // const t = this.gerstnerWater.water.material.uniforms['time'].value
 
     const accumulatedPosition = new THREE.Vector3() // this.object.position.clone()
-
     const accumulatedNormal = new THREE.Vector3(0, 0, 0)
 
     this.floatPoints.forEach(({ fpObject, waveNormalHelper, gravitySlideHelper }) => {

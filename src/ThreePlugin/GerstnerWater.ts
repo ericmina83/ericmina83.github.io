@@ -1,24 +1,20 @@
 import { Vector3, Group, PlaneGeometry, TextureLoader, RepeatWrapping, MathUtils, Vector2, DepthTexture } from "three";
 
 import { Water } from "three/examples/jsm/objects/Water";
-import waterNormals from "./Assets/Textures/waternormals.jpg?url";
+import waterNormals from "../Assets/Textures/waternormals.jpg?url";
 import { getWaveInfo } from "./GerstnerWater.utility";
 
-import waterVert from "./Assets/Shaders/water.vert";
-import waterFrag from "./Assets/Shaders/water.frag";
+import waterVert from "../Assets/Shaders/water.vert";
+import waterFrag from "../Assets/Shaders/water.frag";
 
 export class GerstnerWater extends Group {
   private time = 0;
 
   private water: Water;
 
-  private waves: Vector3[] = [  // angle, amplitude, waveLength
-    new Vector3(MathUtils.degToRad(0), 0.15, 15),
-    new Vector3(MathUtils.degToRad(30), 0.15, 25),
-    new Vector3(MathUtils.degToRad(60), 0.15, 30),
-  ];
+  private readonly waves: Vector3[] = [];
 
-  constructor() {
+  constructor(private depthTexture: DepthTexture) {
     super();
 
     const waterGeometry = new PlaneGeometry(4096, 4096, 256, 256)
@@ -41,14 +37,7 @@ export class GerstnerWater extends Group {
       shader.fragmentShader = waterFrag;
     };
 
-
-    // for (let i = 0; i < 3; i++) {
-    //   const wave = new Vector3();
-    //   wave.x = Math.random() * 2 * Math.PI; // angle in degrees
-    //   wave.y = MathUtils.lerp(0.6, 2.0, Math.random()); // amplitude
-    //   wave.z = MathUtils.lerp(0.5, 2.5, Math.random()); // wavelength
-    //   this.waves.push(wave);
-    // }
+    this.waves = this.createWaves(3);
 
     this.waves.forEach((wave, index) => {
       this.water.material.uniforms[`wave${index + 1}`] = {
@@ -57,6 +46,20 @@ export class GerstnerWater extends Group {
     });
 
     this.add(this.water);
+  }
+
+  private createWaves(count: number) {
+    const waves: Vector3[] = [];
+
+    for (let i = 0; i < count; i++) {
+      const wave = new Vector3();
+      wave.x = Math.random() * 2 * Math.PI; // angle in degrees
+      wave.y = MathUtils.lerp(0.2, 1.0, Math.random()); // steepness
+      wave.z = MathUtils.lerp(30, 40, Math.random()); // wavelength
+      waves.push(wave);
+    }
+
+    return waves;
   }
 
   public updateDeltaTime(deltaTime: number) {

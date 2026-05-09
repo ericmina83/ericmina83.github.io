@@ -52,6 +52,10 @@ export const getWaveInfo = (coord: Vector2, waves: Vector3[], time: number) => {
 
   const normal = binormal.clone().cross(tangent).normalize();
 
+  // if (normal.y < 0) { 
+  //   normal.negate();
+  // }
+
   return {
     offset,
     tangent,

@@ -4,14 +4,14 @@
 uniform mat4 textureMatrix;
 uniform float time;
 
-uniform vec3 wave1;
-uniform vec3 wave2;
-uniform vec3 wave3;
-
 varying vec4 worldPosition;
 varying vec4 mirrorCoord;
 varying vec4 vScreenPos;
 varying vec4 vViewPos;
+
+varying vec3 vNormal;
+varying vec3 vTangent;
+varying vec3 vBionormal;
 
 #include <common>
 #include <fog_pars_vertex>
@@ -19,7 +19,6 @@ varying vec4 vViewPos;
 #include <logdepthbuf_pars_vertex>
 
 const float pi = 3.1415926;
-const int waveCount = 16;
 
 float random(vec2 p) {
     vec3 p3 = fract(vec3(p.xyx) * .1031);
@@ -28,35 +27,43 @@ float random(vec2 p) {
 }
 
 // rotate point a with circle path around the original point
-vec3 getWaveOffset(vec2 coord, float angle, float amplitude, float waveLength) {
-    vec2 d = vec2(cos(angle), sin(angle));
+vec3 getWaveOffset(vec2 coord, float angle, float steepness, float waveLength) {
     float omega = 2.0 * pi / waveLength;
-    float amp = amplitude / omega;
     float c = sqrt(9.8 / omega);
-    float dotWpD = omega * (dot(coord, d) - c * time);
+    vec2 d = vec2(cos(angle), sin(angle));
+    float amp = steepness / omega;
+    float theta = omega * (dot(coord, d) - c * time);
 
-    float x = amp * d.x * cos(dotWpD);
-    float y = amp * sin(dotWpD);
-    float z = amp * d.y * cos(dotWpD);
+    float x = amp * d.x * cos(theta);
+    float y = amp * sin(theta);
+    float z = amp * d.y * cos(theta);
 
     return vec3(x, y, z);
 }
 
-// using partial derivative
-// d coord.x
-// d coord.y
-// vec3 addWaveNormal(vec2 coord, float angle, float amplitude, float waveLength, float steepness, float speed) {
-//     vec2 d = vec2(cos(angle), sin(angle));
-//     float omega = 2.0 * pi / waveLength;
-//     float phase = 2.0 * pi * speed;
-//     float dotWpD = omega * dot(coord, d) + phase * time;
+vec3 addWaveTangent(vec2 coord, float angle, float steepness, float waveLength) {
+    float omega = 2.0 * pi / waveLength;
+    float c = sqrt(9.8 / omega);
+    vec2 d = vec2(cos(angle), sin(angle));
+    float theta = omega * (dot(coord, d) - c * time);
 
-//     float x = amplitude * omega * cos(dotWpD) * d.x;
-//     float y = steepness * omega * sin(dotWpD);
-//     float z = amplitude * omega * cos(dotWpD) * d.y;
+    float x = -d.x * d.x * steepness * sin(theta);
+    float y = d.x * steepness * cos(theta);
+    float z = -d.x * d.y * steepness * sin(theta);
+    return vec3(x, y, z);
+}
 
-//     return vec3(x, y, z);
-// }
+vec3 addWaveBionormal(vec2 coord, float angle, float steepness, float waveLength) {
+    float omega = 2.0 * pi / waveLength;
+    float c = sqrt(9.8 / omega);
+    vec2 d = vec2(cos(angle), sin(angle));
+    float theta = omega * (dot(coord, d) - c * time);
+
+    float x = -d.y * d.x * steepness * sin(theta);
+    float y = d.y * steepness * cos(theta);
+    float z = -d.y * d.y * steepness * sin(theta);
+    return vec3(x, y, z);
+}
 
 float lerp(float min, float max, float t) {
     return min + (max - min) * t;
@@ -64,25 +71,27 @@ float lerp(float min, float max, float t) {
 
 void main() {
     worldPosition = modelMatrix * vec4(position, 1.0);
-    // mirrorCoord = worldPosition.xyzw;
-    // mirrorCoord = textureMatrix * mirrorCoord;
 
     vec3 gp = worldPosition.xyz;
 
     vec2 coord = worldPosition.xz;
+    vec3 tangent = vec3(1.0, 0.0, 0.0);
+    vec3 bionormal = vec3(0.0, 0.0, 1.0);
 
-    // for(int i = 0; i < waveCount; i++) {
-    //     float ang = random(vec2(i, 1.0)) * 2.0 * pi;
-    //     float len = lerp(0.5, 2.0, random(vec2(i, 2.0)));
-    //     float amp = lerp(0.6, 1.0, random(vec2(i, 3.0)));
+    for(int i = 0; i < waveCount; i++) {
+        vec3 wave = waveParameters[i];
+        float ang = wave.x;
+        float ste = wave.y;
+        float len = wave.z;
 
-    //     gp += getWaveOffset(coord, ang, amp, len);
-    //     // gn += addWaveNormal(coord, ang, amp, len, ste, spe);
-    // }
+        gp += getWaveOffset(coord, ang, ste, len);
+        tangent += addWaveTangent(coord, ang, ste, len);
+        bionormal += addWaveBionormal(coord, ang, ste, len);
+    }
 
-    gp += getWaveOffset(coord, wave1.x, wave1.y, wave1.z);
-    gp += getWaveOffset(coord, wave2.x, wave2.y, wave2.z);
-    gp += getWaveOffset(coord, wave3.x, wave3.y, wave3.z);
+    vNormal = normalize(cross(bionormal, tangent));
+    vTangent = normalize(tangent);
+    vBionormal = normalize(bionormal);
 
     worldPosition = vec4(gp, 1.0);
     mirrorCoord = worldPosition.xyzw;

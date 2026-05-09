@@ -1,5 +1,3 @@
-import ReactDOM from "react-dom/client";
-import { App } from "./App";
 import { ThreePlugin } from "./ThreePlugin";
 
 const container = document.getElementById('canvas');

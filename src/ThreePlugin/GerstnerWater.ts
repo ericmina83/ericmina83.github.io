@@ -1,7 +1,7 @@
-import { Vector3, Group, PlaneGeometry, TextureLoader, RepeatWrapping, MathUtils, Vector2, DepthTexture } from "three";
+import { Vector3, Group, PlaneGeometry, TextureLoader, RepeatWrapping, Vector2, ArrowHelper } from "three";
 
 import { Water } from "three/examples/jsm/objects/Water";
-import waterNormals from "../Assets/Textures/waternormals.jpg?url";
+import waterNormals from "../Assets/Textures/waterNormals.jpg?url";
 import { getWaveInfo } from "./GerstnerWater.utility";
 
 import waterVert from "../Assets/Shaders/water.vert";
@@ -14,10 +14,20 @@ export class GerstnerWater extends Group {
 
   private readonly waves: Vector3[] = [];
 
-  constructor(private depthTexture: DepthTexture) {
+  constructor(waveParameters: Vector3[]) {
     super();
 
-    const waterGeometry = new PlaneGeometry(4096, 4096, 256, 256)
+    const waveParametersGLSL =
+      `const int waveCount = ${waveParameters.length};\n` +
+      `const vec3 waveParameters[${waveParameters.length}] = vec3[](\n` +
+      waveParameters
+        .map((wave) => `  vec3(${wave.x}, ${wave.y}, ${wave.z})`)
+        .join(",\n") +
+      "\n);\n\n";
+
+    const waterVertAppend = waveParametersGLSL + waterVert;
+
+    const waterGeometry = new PlaneGeometry(1024, 1024, 256, 256)
 
     this.water = new Water(waterGeometry, {
       textureWidth: 512,
@@ -33,11 +43,13 @@ export class GerstnerWater extends Group {
     });
 
     this.water.material.onBeforeCompile = (shader) => {
-      shader.vertexShader = waterVert;
+      shader.vertexShader = waterVertAppend;
       shader.fragmentShader = waterFrag;
     };
 
-    this.waves = this.createWaves(3);
+    this.waves = waveParameters;
+
+    this.water.rotation.x = -Math.PI / 2;
 
     this.waves.forEach((wave, index) => {
       this.water.material.uniforms[`wave${index + 1}`] = {
@@ -46,20 +58,6 @@ export class GerstnerWater extends Group {
     });
 
     this.add(this.water);
-  }
-
-  private createWaves(count: number) {
-    const waves: Vector3[] = [];
-
-    for (let i = 0; i < count; i++) {
-      const wave = new Vector3();
-      wave.x = Math.random() * 2 * Math.PI; // angle in degrees
-      wave.y = MathUtils.lerp(0.2, 1.0, Math.random()); // steepness
-      wave.z = MathUtils.lerp(30, 40, Math.random()); // wavelength
-      waves.push(wave);
-    }
-
-    return waves;
   }
 
   public updateDeltaTime(deltaTime: number) {
@@ -73,6 +71,39 @@ export class GerstnerWater extends Group {
 
   public updateSun(sun: Vector3): void {
     this.water.material.uniforms['sunDirection'].value.copy(sun).normalize();
+
+    const eye = this.water.material.uniforms['eye'].value;
+
+    if (!this.getObjectByName("sunHelper")) {
+      const sunHelper = new ArrowHelper(
+        sun,
+        new Vector3(0, 0, 0),
+        20,
+        0xff0000
+      );
+      sunHelper.name = "sunHelper";
+      console.log("Sun direction:", sun);
+      this.add(sunHelper);
+    } else {
+      const sunHelper = this.getObjectByName("sunHelper") as import("three").ArrowHelper;
+      sunHelper.setDirection(sun);
+    }
+
+    if (!this.getObjectByName("eyeHelper")) {
+      const eyeHelper = new ArrowHelper(
+        eye.clone().normalize(),
+        new Vector3(0, 0, 0),
+        eye.length(),
+        0x0000ff
+      );
+      eyeHelper.name = "eyeHelper";
+      this.add(eyeHelper);
+    } else {
+      const eyeHelper = this.getObjectByName("eyeHelper") as import("three").ArrowHelper;
+      eyeHelper.setDirection(eye.clone().normalize());
+      eyeHelper.setLength(eye.length());
+    }
+
   }
 
   public getWaveInfo(coord: Vector2) {

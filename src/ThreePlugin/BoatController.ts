@@ -2,7 +2,7 @@ import * as THREE from 'three'
 
 import { GerstnerWater } from './GerstnerWater'
 import boatModel from '../Assets/Models/boat.glb?url';
-import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader';
+import { GLTF, GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader';
 
 const floatPointOffsets: THREE.Vector3[] = [
   new THREE.Vector3(0.05, 0, 0),
@@ -23,7 +23,7 @@ export default class BoatController {
   private horizontalPosition = new THREE.Vector3(0, 0, 0);
 
   constructor(
-    loader: GLTFLoader,
+    model: GLTF,
     private readonly water: GerstnerWater,
     scene: THREE.Scene,
   ) {
@@ -98,6 +98,7 @@ export default class BoatController {
       fpObject.getWorldPosition(worldPos)
 
       waveNormalHelper.position.copy(fpWorldPos)
+      waveNormalHelper.position.copy(new THREE.Vector3(worldPos.x + offset.x, offset.y, worldPos.z + offset.z))
       waveNormalHelper.setDirection(normal)
 
       const gravitySlideDirection = new THREE.Vector3(0, -1, 0)
@@ -105,8 +106,9 @@ export default class BoatController {
         .divideScalar(2)
         .normalize()
 
-      gravitySlideHelper.setDirection(gravitySlideDirection)
       gravitySlideHelper.position.copy(fpWorldPos)
+      gravitySlideHelper.position.copy(new THREE.Vector3(worldPos.x + offset.x, offset.y, worldPos.z + offset.z))
+      gravitySlideHelper.setDirection(gravitySlideDirection)
 
       // accumulatedPosition.y += offset.y
       // accumulatedPosition.x += boat.position.x + normal.x;
@@ -119,9 +121,13 @@ export default class BoatController {
 
     accumulatedPosition.divideScalar(floatPoints.length);
     accumulatedPosition.add(this.horizontalPosition);
-    // accumulatedPosition.y -= 1.5; // Sink boat some height...
+    accumulatedPosition.y -= 1.5; // Sink boat some height...
 
     accumulatedNormal.normalize();
+
+    // if (accumulatedNormal.dot(new THREE.Vector3(0, 1, 0)) < 0) {
+    //   accumulatedNormal.multiplyScalar(-1);
+    // }
 
     boat.position.lerp(accumulatedPosition.add(this.horizontalPosition), 0.25)
 

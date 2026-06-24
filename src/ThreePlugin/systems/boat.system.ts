@@ -2,31 +2,38 @@ import { ECS } from "@/ecs";
 import { ECSSystem } from "@/ecs/system";
 import { BoatComponent } from "../components/boat.component";
 import { LoaderComponent } from "../components/loader.component";
+import { SceneComponent } from "../components/scene.component";
+import { WaterComponent } from "../components/water.component";
 
 export class BoatSystem extends ECSSystem {
-  public init = (ecs: ECS) => {
+  private boatComponent: BoatComponent | null = null;
+
+  public init = undefined;
+
+  public update = (ecs: ECS) => {
     const mainEntity = ecs.getMainEntity();
 
-    const loaderComponent = mainEntity.getComponent(LoaderComponent);
+    if (!this.boatComponent) {
+      const loaderComponent = mainEntity.getComponent(LoaderComponent);
+      if (!loaderComponent) return;
 
-    if (!loaderComponent) {
-      throw new Error('No loader component in main entity');
+      const boatGLTF = loaderComponent.modelMap['boat'];
+      if (!boatGLTF) return;
+
+      const sceneComponent = mainEntity.getComponent(SceneComponent);
+      if (!sceneComponent) return;
+
+      const boatEntity = ecs.createEntity("boat");
+      this.boatComponent = new BoatComponent(sceneComponent.mainScene, boatGLTF);
+      boatEntity.addComponent(this.boatComponent);
     }
 
-    const boatGLTF = loaderComponent.modelMap['boat'];
+    const [waterEntity] = ecs.getEntities([WaterComponent]);
+    if (!waterEntity) return;
 
-    if (!boatGLTF) {
-      throw new Error('No boat gltf');
-    }
+    const waterComponent = waterEntity.getComponent(WaterComponent);
+    if (!waterComponent) return;
 
-    const boatEntity = ecs.createEntity("boat");
-
-    boatEntity.addComponent(new BoatComponent());
-
-  }
-
-  public update = (ecs: ECS, delta: number) => {
-
-
+    this.boatComponent.update(waterComponent.gerstnerWater);
   }
 }

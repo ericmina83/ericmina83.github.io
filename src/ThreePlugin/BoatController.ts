@@ -27,7 +27,9 @@ export default class BoatController {
     private readonly water: GerstnerWater,
     scene: THREE.Scene,
   ) {
-    this.boatPromise = loader.loadAsync(boatModel).then((model) => {
+    const loader = new GLTFLoader();
+    this.boatPromise = loader.loadAsync(boatModel).then((gltf) => {
+      const model = gltf;
       const boat = model.scene;
       boat.scale.setScalar(40);
       scene.add(boat);

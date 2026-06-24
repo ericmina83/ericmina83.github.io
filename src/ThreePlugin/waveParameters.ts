@@ -3,6 +3,7 @@ import { MathUtils, Vector3 } from "three";
 export const getWaveParameters = (waveCount: number) => {
   let steepnessAdd = 0;
 
+  const steepnessScale = 0.3;
   const steepnessMin = 1 / waveCount / 5;
 
   const waves: Vector3[] = [];
@@ -16,7 +17,8 @@ export const getWaveParameters = (waveCount: number) => {
       wave.y = MathUtils.lerp(steepnessMin, 1 - steepnessAdd - (steepnessMin * (waveCount - i - 1)), Math.random()); // steepness
     }
     steepnessAdd += wave.y;
-    wave.z = MathUtils.lerp(20, 30, Math.random()); // wavelength
+    wave.y *= steepnessScale;
+    wave.z = MathUtils.lerp(5, 60, Math.random()); // wavelength
     waves.push(wave);
   }
 

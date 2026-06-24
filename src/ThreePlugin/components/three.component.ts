@@ -19,6 +19,14 @@ export class ThreeComponent extends ECSComponent {
     this.container.appendChild(this.canvas);
   }
 
+  public readonly params = {
+    toneMappingExposure: 0.25,
+  };
+
+  public setToneMappingExposure(exposure: number) {
+    this.renderer.toneMappingExposure = exposure;
+  }
+
   private createRenderer(): WebGLRenderer {
     const renderer = new WebGLRenderer({ antialias: true });
     renderer.toneMapping = ACESFilmicToneMapping;

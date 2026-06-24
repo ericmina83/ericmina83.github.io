@@ -1,4 +1,4 @@
-import { Vector3, Group, PlaneGeometry, TextureLoader, RepeatWrapping, Vector2, ArrowHelper } from "three";
+import { Vector3, Group, PlaneGeometry, TextureLoader, RepeatWrapping, Vector2 } from "three";
 
 import { Water } from "three/examples/jsm/objects/Water";
 import waterNormals from "../Assets/Textures/waterNormals.jpg?url";
@@ -39,13 +39,14 @@ export class GerstnerWater extends Group {
       sunColor: 0xffffff,
       waterColor: 0x001e0f,
       distortionScale: 1.5,
-      fog: false,
+      fog: true,
     });
 
     this.water.material.onBeforeCompile = (shader) => {
       shader.vertexShader = waterVertAppend;
       shader.fragmentShader = waterFrag;
     };
+    this.water.material.needsUpdate = true;
 
     this.waves = waveParameters;
 
@@ -71,39 +72,6 @@ export class GerstnerWater extends Group {
 
   public updateSun(sun: Vector3): void {
     this.water.material.uniforms['sunDirection'].value.copy(sun).normalize();
-
-    const eye = this.water.material.uniforms['eye'].value;
-
-    if (!this.getObjectByName("sunHelper")) {
-      const sunHelper = new ArrowHelper(
-        sun,
-        new Vector3(0, 0, 0),
-        20,
-        0xff0000
-      );
-      sunHelper.name = "sunHelper";
-      console.log("Sun direction:", sun);
-      this.add(sunHelper);
-    } else {
-      const sunHelper = this.getObjectByName("sunHelper") as import("three").ArrowHelper;
-      sunHelper.setDirection(sun);
-    }
-
-    if (!this.getObjectByName("eyeHelper")) {
-      const eyeHelper = new ArrowHelper(
-        eye.clone().normalize(),
-        new Vector3(0, 0, 0),
-        eye.length(),
-        0x0000ff
-      );
-      eyeHelper.name = "eyeHelper";
-      this.add(eyeHelper);
-    } else {
-      const eyeHelper = this.getObjectByName("eyeHelper") as import("three").ArrowHelper;
-      eyeHelper.setDirection(eye.clone().normalize());
-      eyeHelper.setLength(eye.length());
-    }
-
   }
 
   public getWaveInfo(coord: Vector2) {

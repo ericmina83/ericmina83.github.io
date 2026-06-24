@@ -104,6 +104,7 @@ void main() {
     #include <beginnormal_vertex>
     #include <defaultnormal_vertex>
     #include <logdepthbuf_vertex>
+    vec4 mvPosition = vViewPos;
     #include <fog_vertex>
     #include <shadowmap_vertex>
 }

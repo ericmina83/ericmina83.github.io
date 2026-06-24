@@ -13,20 +13,12 @@ export class SkySystem extends ECSSystem {
     const entity = ecs.getMainEntity();
 
     const threeComponent = entity.getComponent(ThreeComponent);
-
-
-    if (!threeComponent) {
-      throw new Error("SkySystem: No ThreeComponent found.");
-    }
+    if (!threeComponent) throw new Error("SkySystem: No ThreeComponent found.");
 
     const sceneComponent = entity.getComponent(SceneComponent);
-
-    if (!sceneComponent) {
-      throw new Error("SkySystem: No SceneComponent found.");
-    }
+    if (!sceneComponent) throw new Error("SkySystem: No SceneComponent found.");
 
     this.skyComponent = new SkyComponent(sceneComponent.mainScene, threeComponent.pmremGenerator);
-
     entity.addComponent(this.skyComponent);
   }
 

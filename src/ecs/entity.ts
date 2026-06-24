@@ -25,7 +25,7 @@ export class ECSEntity {
     this.components.push(component);
   }
 
-  public getComponent<C extends ECSComponent>(ctor: ComponentConstructor<C>) {
-    return this.components.find((component) => component.check(ctor));
+  public getComponent<C extends ECSComponent>(ctor: ComponentConstructor<C>): C | undefined {
+    return this.components.find((component): component is C => component.check(ctor));
   }
 }

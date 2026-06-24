@@ -82,7 +82,7 @@ void main() {
     vec3 tangentNormal = getNoise(worldPosition.xz * size).xyz;
     mat3 tbn = mat3(normalize(vTangent), normalize(vBionormal), normalize(vNormal));
 
-    vec3 surfaceNormal = normalize(vec3(0, -1, 0)); // this for mix
+    vec3 surfaceNormal = normalize(tbn * tangentNormal);
 
     vec3 diffuseLight = vec3(0.0);
     vec3 specularLight = vec3(0.0);

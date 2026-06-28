@@ -1,7 +1,7 @@
 import React from "react";
 import styles from "./styles.module.css";
 
-import googleSvg from "../../Assets/images/google.svg?url";
+import googleSvg from "../../Assets/Images/google.svg?url";
 
 export const Profile: React.FC = () => {
   return (

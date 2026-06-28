@@ -21,19 +21,12 @@ uniform float cameraFar;
 
 varying vec4 mirrorCoord;
 varying vec4 worldPosition;
+// varying vec4 vScreenPos;
+// varying vec4 vViewPos;
 
-// vec4 getNoise(vec2 uv) {
-//     vec2 uv0 = (uv / 103.0) + vec2(time / 17.0, time / 29.0);
-//     vec2 uv1 = uv / 107.0 - vec2(time / -19.0, time / 31.0);
-//     vec2 uv2 = uv / vec2(890.70, 980.30) + vec2(time / 101.0, time / 97.0);
-//     vec2 uv3 = uv / vec2(1091.0, 1027.0) - vec2(time / 109.0, time / -113.0);
-//     vec4 noise = texture2D(normalSampler, uv0) +
-//         texture2D(normalSampler, uv1) +
-//         texture2D(normalSampler, uv2) +
-//         texture2D(normalSampler, uv3);
-
-//     return noise * 0.5 - 1.0;
-// }
+varying vec3 vNormal;
+varying vec3 vTangent;
+varying vec3 vBionormal;
 
 #include <common>
 #include <packing>
@@ -68,26 +61,28 @@ void sunLight(
     inout vec3 specularColor
 ) {
     vec3 reflection = normalize(reflect(-sunDirection, surfaceNormal));
-    float direction = max(0.0, dot(eyeDirection, reflection));
+    float direction = abs( dot(eyeDirection, reflection));
     specularColor += pow(abs(direction), shiny) * sunColor * spec;
-    diffuseColor += max(dot(sunDirection, surfaceNormal), 0.0) * sunColor * diffuse;
+    diffuseColor += abs(dot(sunDirection, surfaceNormal)) * sunColor * diffuse;
 }
 
-// https://gist.github.com/greggman/41d93c00649cba78abdbfc1231c9158c
-float perspectiveDepthToViewZTEMP(const in float invClipZ, const in float near, const in float far) {
-    return (near * far) / ((far - near) * invClipZ - far);
-}
+// // https://gist.github.com/greggman/41d93c00649cba78abdbfc1231c9158c
+// float perspectiveDepthToViewZTEMP(const in float invClipZ, const in float near, const in float far) {
+//     return (near * far) / ((far - near) * invClipZ - far);
+// }
 
 float readDepth(sampler2D depthSampler, vec2 coord) {
     float fragCoordZ = texture2D(depthSampler, coord).x;
-    return perspectiveDepthToViewZTEMP(fragCoordZ, cameraNear, cameraFar);
+    return perspectiveDepthToViewZ(fragCoordZ, cameraNear, cameraFar);
 }
 
 void main() {
     #include <logdepthbuf_fragment>
 
-    vec4 noise = getNoise(worldPosition.xz * size);
-    vec3 surfaceNormal = normalize(noise.xzy * vec3(1.5, 1.0, 1.5)); // this for mix
+    vec3 tangentNormal = getNoise(worldPosition.xz * size).xyz;
+    mat3 tbn = mat3(normalize(vTangent), normalize(vBionormal), normalize(vNormal));
+
+    vec3 surfaceNormal = normalize(tbn * tangentNormal);
 
     vec3 diffuseLight = vec3(0.0);
     vec3 specularLight = vec3(0.0);

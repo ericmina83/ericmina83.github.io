@@ -1,6 +1,6 @@
 import { Vector2 } from "three";
 import { Rng } from "./Rng";
-import { lerp } from "three/src/math/MathUtils";
+import { MathUtils } from "three";
 
 const fadeFunction = (t: number) => {
   return t * (t * (t * (10 + t * (-15 + 6 * t))))
@@ -60,13 +60,13 @@ export class PerlinNoise {
       }
     }
 
-    return lerp(
-      lerp(
+    return MathUtils.lerp(
+      MathUtils.lerp(
         pixel[0][0],
         pixel[1][0],
         fadeFunction(sample.x)
       ),
-      lerp(
+      MathUtils.lerp(
         pixel[0][1],
         pixel[1][1],
         fadeFunction(sample.x)

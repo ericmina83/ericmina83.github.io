@@ -1,7 +1,7 @@
 import { Vector3, Group, PlaneGeometry, TextureLoader, RepeatWrapping, Vector2 } from "three";
 
 import { Water } from "three/examples/jsm/objects/Water";
-import waterNormals from "../Assets/Textures/waterNormals.jpg?url";
+import waterNormals from "../Assets/Textures/waternormals.jpg?url";
 import { getWaveInfo } from "./GerstnerWater.utility";
 
 import waterVert from "../Assets/Shaders/water.vert";

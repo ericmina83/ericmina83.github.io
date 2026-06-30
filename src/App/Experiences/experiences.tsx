@@ -22,8 +22,8 @@ export const experiences: Experience[] = [
     description: (
       <>
         <ul>
-          <li> Develop 3d touring system for our customer <a href="https://ogulo.com">Ogulo</a>. </li>
-          <li> Develop an online store for TRPG music play app <a href="https://www.tabletone.app/">TableTone</a> </li>
+          <li>Built a 3D virtual touring system, leveraging extensive Three.js expertise alongside a solid background in game industry 3D development to independently deliver complex web-based 3D experiences.</li>
+          <li>Collaborated with the team to develop an online store for a TRPG music platform, integrating Stripe payment with a full-stack approach using React, Express, and TypeORM.</li>
         </ul>
       </>
     ),
